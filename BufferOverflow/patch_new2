@@ -1,0 +1,24 @@
+--- webserver-orig.c	2019-10-09 08:08:39.772435000 -0700
++++ webserver.c	2019-10-11 06:43:50.568535000 -0700
+@@ -85,14 +85,18 @@
+ 		hdrptr += strlen(searchstr); 
+ 		if (hdrend = strstr(hdrptr, "\r\n")) { 
+ 			char hdrval[1024]; // temporary return value
+-			memcpy((char *)hdrval, hdrptr, (hdrend - hdrptr));
++			if (hdrend - hdrptr >= 2014){ //including bound checks
++				memcpy((char *)hdrval, hdrptr, 1023) //if byte is less then copy
++			} else{
++				memcpy((char *)hdrval, hdrptr, (hdrend - hdrptr));
++			}
+ 			hdrval[hdrend - hdrptr] = '\0'; // tack null onto end of header value
+ 			int hdrvallen = strlen(hdrval);
+ 			retval = (char *)malloc((hdrvallen + 1) * sizeof(char)); // malloc a space for retval
+-			strcpy(retval, (char *)hdrval);
++			strncpy(retval, (char *)hdrval);
+ 		} else {
+ 			retval = (char *)malloc((strlen(hdrptr) + 1) * sizeof(char)); //
+-			strcpy(retval, hdrptr);
++			strncpy(retval, hdrptr);
+ 		}
+ 	}
+ 
